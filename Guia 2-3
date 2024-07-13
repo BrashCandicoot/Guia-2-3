@@ -1,0 +1,551 @@
+//---------------------------------------------------------------------
+//Guia 3
+//---------------------------------------------------------------------
+//Ejercicio 1
+import Foundation
+
+// Definimos una enumeración para los diferentes estados de un pedido
+enum EstadoPedido {
+    case procesando, enviado, entregado
+}
+
+// Protocolo que define un método para notificar cambios en el estado del pedido
+protocol NotificacionPedido {
+    func notificarCambioDeEstado(estado: EstadoPedido)
+}
+
+// Clase Pedido que tiene una propiedad de estado y un delegado para manejar notificaciones
+class Pedido {
+    var estado: EstadoPedido {
+        didSet {
+            // Notificamos al delegado cuando el estado cambia
+            delegado?.notificarCambioDeEstado(estado: estado)
+        }
+    }
+    var delegado: NotificacionPedido?
+
+    // Inicializador para establecer el estado inicial y el delegado
+    init(estado: EstadoPedido, delegado: NotificacionPedido? = nil) {
+        self.estado = estado
+        self.delegado = delegado
+    }
+
+    // Función para cambiar el estado del pedido
+    func cambiarEstadoA(_ nuevoEstado: EstadoPedido) {
+        self.estado = nuevoEstado
+    }
+}
+
+// Clase Cliente que implementa el protocolo NotificacionPedido
+class Cliente: NotificacionPedido {
+    func notificarCambioDeEstado(estado: EstadoPedido) {
+        print("El estado del pedido ha cambiado a: \(estado)")
+    }
+}
+
+// Ejemplo de uso:
+let cliente = Cliente()
+let pedido = Pedido(estado: .procesando, delegado: cliente)
+pedido.cambiarEstadoA(.enviado)
+
+//--------------------------------------------------------------------------
+// Ejercicio 2
+class Calculadora {
+    // Función estática para sumar dos números
+    static func sumar(_ a: Int, _ b: Int) -> Int {
+        return a + b
+    }
+
+    // Función estática para restar dos números
+    static func restar(_ a: Int, _ b: Int) -> Int {
+        return a - b
+    }
+
+    // Función para calcular la suma y resta total de los elementos en un array
+    static func calcularSumaYRestar(array: [Int]) -> (suma: Int, resta: Int) {
+        let suma = array.reduce(0, sumar)
+        let resta = array.reduce(0, restar)
+        return (suma, resta)
+    }
+}
+
+// Ejemplo de uso:
+let numeros = [1, 2, 3, 4, 5]
+let resultado = Calculadora.calcularSumaYRestar(array: numeros)
+print("Suma: \(resultado.suma), Resta: \(resultado.resta)")
+
+//---------------------------------------------------------------------------
+
+//Ejercicio 3
+// Protocolo Figura que define un método para calcular el área
+protocol Figura {
+    func calcularArea() -> Double
+}
+
+// Estructura Cuadrado que conforma el protocolo Figura
+struct Cuadrado: Figura {
+    var lado: Double
+
+    func calcularArea() -> Double {
+        return lado * lado
+    }
+}
+
+// Estructura Rectangulo que conforma el protocolo Figura
+struct Rectangulo: Figura {
+    var ancho: Double
+    var alto: Double
+
+    func calcularArea() -> Double {
+        return ancho * alto
+    }
+}
+
+// Función para calcular el área total de un array de figuras
+func calcularAreaTotal(figuras: [Figura]) -> Double {
+    return figuras.reduce(0) { $0 + $1.calcularArea() }
+}
+
+// Ejemplo de uso:
+let cuadrado = Cuadrado(lado: 3)
+let rectangulo = Rectangulo(ancho: 4, alto: 5)
+let figuras: [Figura] = [cuadrado, rectangulo]
+let areaTotal = calcularAreaTotal(figuras: figuras)
+print("Área total: \(areaTotal)")
+
+
+//---------------------------------------------------------------
+//Ejercicio 4
+
+// Enumeración para las operaciones matemáticas
+enum OperacionMatematica {
+    case suma, resta, multiplicacion, division
+}
+
+// Clase OperadorMatematico con una función estática para realizar operaciones
+class OperadorMatematico {
+    static func realizarOperacion(_ a: Double, _ b: Double, operacion: OperacionMatematica) -> Double? {
+        switch operacion {
+        case .suma:
+            return a + b
+        case .resta:
+            return a - b
+        case .multiplicacion:
+            return a * b
+        case .division:
+            guard b != 0 else { return nil }
+            return a / b
+        }
+    }
+}
+
+// Ejemplo de uso:
+if let resultado = OperadorMatematico.realizarOperacion(10, 5, operacion: .division) {
+    print("Resultado: \(resultado)")
+} else {
+    print("Error en la operación")
+}
+
+
+//------------------------------------------------------------------------
+//Ejercicio 5
+
+// Protocolo Empleado que define un método para calcular el salario
+protocol Empleado {
+    func calcularSalario() -> Double
+}
+
+// Clase EmpleadoBase que conforma el protocolo Empleado
+class EmpleadoBase: Empleado {
+    var salarioBase: Double
+
+    init(salarioBase: Double) {
+        self.salarioBase = salarioBase
+    }
+
+    func calcularSalario() -> Double {
+        return salarioBase
+    }
+}
+
+// Estructura EmpleadoContrato que conforma el protocolo Empleado
+struct EmpleadoContrato: Empleado {
+    var salarioPorHora: Double
+    var horasTrabajadas: Double
+
+    func calcularSalario() -> Double {
+        return salarioPorHora * horasTrabajadas
+    }
+}
+
+// Función para calcular el salario total de un array de empleados
+func calcularSalarioTotal(empleados: [Empleado]) -> Double {
+    return empleados.reduce(0) { $0 + $1.calcularSalario() }
+}
+
+// Ejemplo de uso:
+let empleadoFijo = EmpleadoBase(salarioBase: 3000)
+let empleadoTemporal = EmpleadoContrato(salarioPorHora: 20, horasTrabajadas: 160)
+let empleados: [Empleado] = [empleadoFijo, empleadoTemporal]
+let salarioTotal = calcularSalarioTotal(empleados: empleados)
+print("Salario total: \(salarioTotal)")
+
+
+//---------------------------------------------------------------------
+//Guia 2
+//---------------------------------------------------------------------
+//Ejercicio 1
+
+import Foundation
+
+// Función para calcular el área y el perímetro de un rectángulo
+func calcularAreaYPerimetro(ancho: Double, alto: Double) -> (area: Double, perimetro: Double) {
+    // Constantes para el cálculo del área y el perímetro
+    let area = ancho * alto
+    let perimetro = 2 * (ancho + alto)
+    // Retorna una tupla con el área y el perímetro
+    return (area, perimetro)
+}
+
+// Llamada a la función con valores de prueba
+let resultados = calcularAreaYPerimetro(ancho: 5.0, alto: 10.0)
+print("Área: \(resultados.area), Perímetro: \(resultados.perimetro)")
+
+
+//---------------------------------------------------------------
+//Ejercicio 2
+
+import Foundation
+
+// Función para validar si tres lados pueden formar un triángulo
+func esTrianguloValido(a: Double, b: Double, c: Double) -> Bool {
+    return a + b > c && a + c > b && b + c > a
+}
+
+// Función para calcular el área de un triángulo utilizando la fórmula de Herón
+func calcularAreaTriangulo(a: Double, b: Double, c: Double) -> Double? {
+    // Verifica si los lados forman un triángulo válido
+    guard esTrianguloValido(a: a, b: b, c: c) else {
+        return nil // Retorna nil si no es un triángulo válido
+    }
+    
+    // Calcula el semiperímetro
+    let s = (a + b + c) / 2
+    // Calcula el área utilizando la fórmula de Herón
+    let area = sqrt(s * (s - a) * (s - b) * (s - c))
+    return area
+}
+
+// Llamada a la función con valores de prueba
+if let area = calcularAreaTriangulo(a: 3.0, b: 4.0, c: 5.0) {
+    print("Área del triángulo: \(area)")
+} else {
+    print("Los lados proporcionados no forman un triángulo válido.")
+}
+
+//--------------------------------------------------
+//Ejercicio 3
+
+import Foundation
+
+// Función para calcular la media, mediana y moda de un array de enteros
+func calcularEstadisticas(array: [Int]) -> (media: Double, mediana: Double, moda: Int?) {
+    let sortedArray = array.sorted()
+    
+    // Cálculo de la media
+    let suma = array.reduce(0, +)
+    let media = Double(suma) / Double(array.count)
+    
+    // Cálculo de la mediana
+    let mitad = array.count / 2
+    let mediana: Double
+    if array.count % 2 == 0 {
+        mediana = Double(sortedArray[mitad - 1] + sortedArray[mitad]) / 2.0
+    } else {
+        mediana = Double(sortedArray[mitad])
+    }
+    
+    // Cálculo de la moda
+    var frecuencia = [Int: Int]()
+    for num in array {
+        frecuencia[num, default: 0] += 1
+    }
+    let moda = frecuencia.max { a, b in a.value < b.value }?.key
+    
+    return (media, mediana, moda)
+}
+
+// Llamada a la función con un array de prueba
+let estadisticas = calcularEstadisticas(array: [1, 2, 2, 3, 4])
+print("Media: \(estadisticas.media), Mediana: \(estadisticas.mediana), Moda: \(estadisticas.moda ?? -1)")
+
+
+//--------------------------------------------------------
+//Ejercicio 4
+
+import Foundation
+
+// Función para sumar dos matrices
+func sumaMatrices(_ matriz1: [[Int]], _ matriz2: [[Int]]) -> [[Int]]? {
+    guard matriz1.count == matriz2.count && matriz1[0].count == matriz2[0].count else {
+        return nil // Retorna nil si las dimensiones no son compatibles
+    }
+    
+    var resultado = matriz1
+    for i in 0..<matriz1.count {
+        for j in 0..<matriz1[i].count {
+            resultado[i][j] += matriz2[i][j]
+        }
+    }
+    return resultado
+}
+
+// Función para multiplicar dos matrices
+func multiplicarMatrices(_ matriz1: [[Int]], _ matriz2: [[Int]]) -> [[Int]]? {
+    guard matriz1[0].count == matriz2.count else {
+        return nil // Retorna nil si las dimensiones no son compatibles
+    }
+    
+    var resultado = Array(repeating: Array(repeating: 0, count: matriz2[0].count), count: matriz1.count)
+    
+    for i in 0..<matriz1.count {
+        for j in 0..<matriz2[0].count {
+            for k in 0..<matriz2.count {
+                resultado[i][j] += matriz1[i][k] * matriz2[k][j]
+            }
+        }
+    }
+    return resultado
+}
+
+// Matrices de prueba
+let matriz1 = [[1, 2, 3], [4, 5, 6]]
+let matriz2 = [[7, 8, 9], [10, 11, 12]]
+let matriz3 = [[1, 2], [3, 4], [5, 6]]
+
+// Llamada a las funciones de suma y multiplicación con matrices de prueba
+if let suma = sumaMatrices(matriz1, matriz2) {
+    print("Suma de matrices: \(suma)")
+} else {
+    print("Las matrices no tienen dimensiones compatibles para la suma.")
+}
+
+if let multiplicacion = multiplicarMatrices(matriz1, matriz3) {
+    print("Multiplicación de matrices: \(multiplicacion)")
+} else {
+    print("Las matrices no tienen dimensiones compatibles para la multiplicación.")
+}
+
+//-------------------------------------------------
+//Ejercicio 5
+
+import Foundation
+
+// Función para ordenar un array utilizando el algoritmo de ordenamiento por selección
+func ordenarPorSeleccion(array: [Int]) -> [Int] {
+    var arr = array
+    for i in 0..<arr.count {
+        var minIndex = i
+        for j in i+1..<arr.count {
+            if arr[j] < arr[minIndex] {
+                minIndex = j
+            }
+        }
+        if i != minIndex {
+            arr.swapAt(i, minIndex)
+        }
+    }
+    return arr
+}
+
+// Llamada a la función con un array de prueba
+let arrayOrdenado = ordenarPorSeleccion(array: [64, 25, 12, 22, 11])
+print("Array ordenado: \(arrayOrdenado)")
+
+
+//-----------------------------------------------------
+//Ejercicio 6
+
+import Foundation
+
+// Clase Grafo que representa un grafo utilizando una lista de adyacencia
+class Grafo {
+    private var adyacencia: [Int: [Int]] = [:]
+    
+    // Método para agregar un nodo y sus conexiones
+    func agregarNodo(_ nodo: Int, con conexiones: [Int]) {
+        adyacencia[nodo] = conexiones
+    }
+    
+    // Método para realizar la búsqueda en profundidad (DFS)
+    func dfs(desde nodoInicial: Int) -> [Int] {
+        var visitados: Set<Int> = []
+        var resultado: [Int] = []
+        dfsHelper(nodo: nodoInicial, visitados: &visitados, resultado: &resultado)
+        return resultado
+    }
+    
+    // Función auxiliar para la DFS
+    private func dfsHelper(nodo: Int, visitados: inout Set<Int>, resultado: inout [Int]) {
+        visitados.insert(nodo)
+        resultado.append(nodo)
+        guard let vecinos = adyacencia[nodo] else { return }
+        for vecino in vecinos {
+            if !visitados.contains(vecino) {
+                dfsHelper(nodo: vecino, visitados: &visitados, resultado: &resultado)
+            }
+        }
+    }
+}
+
+// Creación de un grafo y prueba de la función DFS
+let grafo = Grafo()
+grafo.agregarNodo(0, con: [1, 2])
+grafo.agregarNodo(1, con: [2])
+grafo.agregarNodo(2, con: [0, 3])
+grafo.agregarNodo(3, con: [3])
+
+let recorridoDFS = grafo.dfs(desde: 2)
+print("Recorrido DFS: \(recorridoDFS)")
+
+//-----------------------------------------------------------
+// Ejercicio 7
+
+import Foundation
+
+// Función recursiva para calcular la suma de los primeros N números
+func sumaRecursiva(_ n: Int) -> Int {
+    if n <= 0 {
+        return 0
+    } else {
+        return n + sumaRecursiva(n - 1)
+    }
+}
+
+// Función iterativa para calcular la suma de los primeros N números
+func sumaIterativa(_ n: Int) -> Int {
+    var suma = 0
+    for i in 1...n {
+        suma += i
+    }
+    return suma
+}
+
+// Prueba de ambas funciones con un valor de ejemplo
+let n = 10
+print("Suma recursiva de los primeros \(n) números: \(sumaRecursiva(n))")
+print("Suma iterativa de los primeros \(n) números: \(sumaIterativa(n))")
+
+//------------------------------------------------------------
+//Ejercicio 8
+
+import Foundation
+
+// Función recursiva para implementar la búsqueda binaria
+func busquedaBinariaRecursiva(array: [Int], valor: Int, inicio: Int, fin: Int) -> Int? {
+    if inicio > fin {
+        return nil
+    }
+    let medio = (inicio + fin) / 2
+    if array[medio] == valor {
+        return medio
+    } else if array[medio] > valor {
+        return busquedaBinariaRecursiva(array: array, valor: valor, inicio: inicio, fin: medio - 1)
+    } else {
+        return busquedaBinariaRecursiva(array: array, valor: valor, inicio: medio + 1, fin: fin)
+    }
+}
+
+// Prueba de la función con un array de ejemplo
+let array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+if let posicion = busquedaBinariaRecursiva(array: array, valor: 7, inicio: 0, fin: array.count - 1) {
+    print("Valor encontrado en la posición: \(posicion)")
+} else {
+    print("Valor no encontrado en el array.")
+}
+
+//------------------------------------------------------------------
+//Ejercicio 9
+
+import Foundation
+
+// Clase Coche con propiedades para marca, modelo y año
+class Coche {
+    var marca: String
+    var modelo: String
+    var año: Int
+    
+    // Inicializador de la clase
+    init(marca: String, modelo: String, año: Int) {
+        self.marca = marca
+        self.modelo = modelo
+        self.año = año
+    }
+    
+    // Método para describir el coche
+    func describir() -> String {
+        return "Coche: \(marca) \(modelo), Año: \(año)"
+    }
+}
+
+// Creación de una instancia de Coche y llamada al método describir
+let miCoche = Coche(marca: "Toyota", modelo: "Corolla", año: 2021)
+print(miCoche.describir())
+
+//---------------------------------------------------------------------
+//Ejercicio 10
+
+import Foundation
+
+// Struct Rectángulo con propiedades para ancho y alto
+struct Rectangulo {
+    var ancho: Double
+    var alto: Double
+    
+    // Método para calcular el área
+    func calcularArea() -> Double {
+        return ancho * alto
+    }
+    
+    // Método para calcular el perímetro
+    func calcularPerimetro() -> Double {
+        return 2 * (ancho + alto)
+    }
+}
+
+// Creación de una instancia de Rectángulo y llamada a los métodos
+let miRectangulo = Rectangulo(ancho: 5.0, alto: 10.0)
+print("Área del rectángulo: \(miRectangulo.calcularArea())")
+print("Perímetro del rectángulo: \(miRectangulo.calcularPerimetro())")
+
+
+//--------------------------------------------------------------------
+//Ejercicio 11
+
+import Foundation
+
+// Protocolo Volable con un método volar
+protocol Volable {
+    func volar()
+}
+
+// Clase Pájaro que conforma el protocolo Volable
+class Pajaro: Volable {
+    func volar() {
+        print("El pájaro está volando.")
+    }
+}
+
+// Clase Avión que conforma el protocolo Volable
+class Avion: Volable {
+    func volar() {
+        print("El avión está volando.")
+    }
+}
+
+// Creación de instancias de Pájaro y Avión y llamada al método volar
+let miPajaro = Pajaro()
+let miAvion = Avion()
+
+miPajaro.volar()
+miAvion.volar()
